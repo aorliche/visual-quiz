@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Visual Quiz: Create and Edit</title>
+		<link rel='stylesheet' href='./css/create.css'>
+		<script src='./js/create.js' type='module'></script>
+	</head>
+	<body>
+		<!-- Error part -->
+		<p id='err'></p>
+		<!-- Upload part -->
+		<div id='head-div'>
+			<div id='upload-div'>
+				<h3>Upload a Page</h3>
+				<form id='upload-form' action='upload.php' method='post' enctype='multipart/form-data'>
+					<label for='page-upload'>Select page image to upload:</label>
+					<input type='file' name='page-upload' id='page-upload'><br>
+					<label for='page-name'>Page name:</label>
+					<input type='text' name='page-name' id='page-name'><br>
+					<label for='page-password'>Page password:</label>
+					<input type='text' name='page-password' id='page-password'><br>
+					<input type='submit' value='Upload Page' id='page-upload-submit'><br>
+				</form>
+				<p id='page-name-warning'>Page name can only contain alphanumeric characters 
+					and cannot be blank</p>
+				<p id='page-name-dup-warning'>Page with that name already exists</p>
+				<p id='page-password-warning'>Page password can only contain alphanumeric characters 
+					and cannot be blank</p>
+				<br>
+			</div>
+			<!-- Select part -->
+			<div id='select-div'>
+				<h3>Select a Page</h3>
+				<label for='page-select'>Select a page:</label>
+				<select id='page-select'>
+				</select><br>
+				<br>
+			</div>
+		</div>
+		<hr>
+		<!-- Edit part -->
+		<p>Editing page <b id='edit-page-name'></b></p>
+		<label for='edit-password'>Page password:</label>
+		<input type='text' name='edit-password' id='edit-password'><br>
+		<input type='submit' value='Delete Page' id='delete-page'><br><br>
+		<input type='radio' name='edit-actions' id='edit-place-block'>
+		<label for='edit-place-block'>Click and drag to place block to hide text</label>
+		<input type='radio' name='edit-actions' id='edit-place-letter'>
+		<label for='edit-place-letter'>Place letter</label>
+		<input type='radio' name='edit-actions' id='edit-delete'>
+		<label for='edit-delete'>Delete block or letter</label><br>
+		<canvas id='edit-canvas' width='1000' height='750'></canvas>
+	</body>
+</html>
