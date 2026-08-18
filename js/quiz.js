@@ -144,11 +144,13 @@ function drawBlock(ctx, idx) {
 }
 
 function repaint() {
+	const canvas = $('#quiz-canvas');
+	const ctx = canvas.getContext('2d');
+	// Clear previous
+	ctx.clearRect(0,0,canvas.width,canvas.height);
 	if (!img) {
 		return;
 	}
-	const canvas = $('#quiz-canvas');
-	const ctx = canvas.getContext('2d');
 	const wRatio = canvas.width/img.width;
 	const hRatio = canvas.height/img.height;
 	let w, h;
