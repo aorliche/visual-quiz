@@ -148,7 +148,8 @@ function drawBlock(ctx, idx) {
 	if (letters[idx]) {
 		ctx.font = '24px sans-serif';
 		ctx.fillStyle = '#000';
-		ctx.fillText(letters[idx], sx+w/2-6, sy+h/2+8);
+		const dx = letters[idx].length == 1 ? 6 : 12;
+		ctx.fillText(letters[idx], sx+w/2-dx, sy+h/2+8);
 	}
 }
 
@@ -232,7 +233,7 @@ window.addEventListener('load', e => {
 	fetch('get-pages.php')
 	.then(resp => resp.json())
 	.then(json => {
-		pages = json;
+		pages = json.toSorted();
 		for (let i=0; i<pages.length; i++) {
 			const opt = document.createElement('option');
 			opt.innerText = pages[i];

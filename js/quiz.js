@@ -175,7 +175,7 @@ window.addEventListener('load', e => {
 	fetch('get-pages.php')
 	.then(resp => resp.json())
 	.then(json => {
-		pages = json;
+		pages = json.toSorted();
 		for (let i=0; i<pages.length; i++) {
 			const opt = document.createElement('option');
 			opt.innerText = pages[i];
