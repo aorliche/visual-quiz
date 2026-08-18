@@ -180,7 +180,7 @@ function regenLetters() {
 }
 
 function repaint() {
-	const canvas = $('#quiz-canvas');
+	const canvas = $('#edit-canvas');
 	const ctx = canvas.getContext('2d');
 	// Clear previous
 	ctx.clearRect(0,0,canvas.width,canvas.height);
