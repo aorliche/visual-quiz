@@ -1,0 +1,31 @@
+#page-name {
+	display: none;
+}
+
+.hidden {
+	display: none;
+}
+
+#answers-div {
+	display: inline-block;
+	width: 500px;
+	vertical-align: top;
+	margin-left: 10px;
+}
+
+#answers-div input {
+	width: 250px;
+}
+
+#answers-div input, #answers-div button {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+#answers-div img {
+	vertical-align: middle;
+}
+
+#quiz-canvas {
+	border: 1px solid black;
+}
