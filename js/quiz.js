@@ -139,7 +139,8 @@ function drawBlock(ctx, idx) {
 	if (letters[idx]) {
 		ctx.font = '24px sans-serif';
 		ctx.fillStyle = '#000';
-		ctx.fillText(letters[idx], sx+w/2-6, sy+h/2+8);
+		const dx = letters[idx].length == 1 ? 6 : 12;
+		ctx.fillText(letters[idx], sx+w/2-dx, sy+h/2+8);
 	}
 }
 
