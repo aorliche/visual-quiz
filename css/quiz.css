@@ -13,6 +13,11 @@
 	margin-left: 10px;
 }
 
+#answers-div span:first-child {
+	display: inline-block;
+	width: 20px;
+}
+
 #answers-div input {
 	width: 300px;
 }
@@ -28,4 +33,9 @@
 
 #quiz-canvas {
 	border: 1px solid black;
+}
+
+#left {
+	width: 1010px;
+	display: inline-block;
 }
