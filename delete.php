@@ -48,15 +48,7 @@ $stmt = $conn->prepare('delete from visual_quiz_pages where id = ?');
 $stmt->bind_param('i', $page_id);
 $stmt->execute();
 
-$stmt = $conn->prepare('delete from visual_quiz_pages_answers where page_id = ?');
-$stmt->bind_param('i', $page_id);
-$stmt->execute();
-
 $stmt = $conn->prepare('delete from visual_quiz_pages_blocks where page_id = ?');
-$stmt->bind_param('i', $page_id);
-$stmt->execute();
-
-$stmt = $conn->prepare('delete from visual_quiz_pages_letters where page_id = ?');
 $stmt->bind_param('i', $page_id);
 $stmt->execute();
 

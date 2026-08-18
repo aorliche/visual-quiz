@@ -30,6 +30,7 @@ label[for='edit-password'] {
 #edit-canvas {
 	border: 1px solid black;
 	margin: 2px;
+	margin-top: 10px;
 }
 
 #select-div, #upload-div {
@@ -44,3 +45,25 @@ label[for='edit-password'] {
 	font-weight: bold;
 }
 
+#feedback {
+	color: green;
+	display: none;
+	font-weight: bold;
+}
+
+#answers-div {
+	display: inline-block;
+	width: 430px;
+	vertical-align: top;
+}
+
+.answer-input {
+	margin-left: 5px;
+	margin-right: 5px;
+	width: 300px;
+}
+
+#edit-div {
+	display: inline-block;
+	width: 1010px;
+}

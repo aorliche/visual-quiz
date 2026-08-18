@@ -17,31 +17,30 @@ $stmt = $conn->prepare('select id from visual_quiz_pages where name = ?');
 $stmt->bind_param('s', $name);
 $stmt->execute();
 $res = $stmt->get_result();
+
+// Bad name
+if ($res->num_rows !== 1) {
+	$err = array('err' => 'NoSuchPageName');
+	echo json_encode($err);
+	die();
+}
+
 $row = $res->fetch_assoc();
 $page_id = $row['id'];
 
 // Get blocks
-$stmt = $conn->prepare('select x,y,w,h from visual_quiz_pages_blocks where page_id = ?');
+$stmt = $conn->prepare('select fromx,fromy,tox,toy,answer '
+	. 'from visual_quiz_pages_blocks where page_id = ?');
 $stmt->bind_param('i', $page_id);
 $stmt->execute();
 $res = $stmt->get_result();
 
 $blocks = array();
 
-for ($row = $res->fetch_assoc()) {
+while ($row = $res->fetch_assoc()) {
 	array_push($blocks, $row);
 }
 
-// Get letters
-$stmt = $conn->prepare('select x,y,letter from visual_quiz_pages_letters where page_id = ?');
-$stmt->bind_param('i', $page_id);
-$stmt->execute();
-$res = $stmt->get_result();
+echo json_encode($blocks);
 
-$letters = array();
-
-for ($row = $res->fetch_assoc()) {
-	array_push($letters, $row);
-}
-
-// Get answers
+?>

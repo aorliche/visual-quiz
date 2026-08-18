@@ -9,16 +9,65 @@ function Block(from, to) {
 	return {from, to};
 }
 
-function addingBlocks() {
-	return $('#edit-place-block').checked;
-}
-
 function isAlphaNumeric(text) {
 	return text.match(/^[A-z0-9]*$/);
 }
 
 function isBlank(text) {
 	return text === '';
+}
+
+// Add answer to answers-div
+function addAnswer(answer) {
+	const p = document.createElement('p');
+	const letter = document.createElement('span');
+	const answerInput = document.createElement('input');
+	answerInput.type = 'text';
+	answerInput.classList.add('answer-input');
+	const hideButton = document.createElement('button');
+	const deleteButton = document.createElement('button');
+	hideButton.innerText = 'Hide';
+	deleteButton.innerText = 'Delete';
+	p.appendChild(letter);
+	p.appendChild(answerInput);
+	p.appendChild(hideButton);
+	p.appendChild(deleteButton);
+	// Make block a non-answer
+	hideButton.addEventListener('click', e => {
+		if (hideButton.innerText === 'Hide') {
+			letter.style.display = 'none';
+			answerInput.style.display = 'none';
+			hideButton.innerText = 'Show';
+		} else {
+			letter.style.display = 'inline';
+			answerInput.style.display = 'inline-block';
+			hideButton.innerText = 'Hide';
+		}
+		regenLetters();
+		repaint();
+	});
+	// Delete from blocks
+	deleteButton.addEventListener('click', e => {
+		// Get block index corresponding to this p, then delete that block
+		const ps = $$('#answers-div p');
+		for (let i=0; i<ps.length; i++) {
+			if (ps[i] === p) {
+				blocks.splice(i, 1);
+				break;
+			}
+		}
+		p.parentNode.removeChild(p);
+		regenLetters();
+		repaint();
+	});
+	$('#answers-div').appendChild(p);
+	// If we're getting from database
+	// Also need to update show-hide for answer-less blocks
+	if (answer) {
+		answerInput.value = answer;
+	} else {
+		hideButton.dispatchEvent(new Event('click'));
+	}
 }
 
 let pages = [];
@@ -49,10 +98,38 @@ function editPage(name, password) {
 		img.addEventListener('load', e => {
 			repaint();
 		});
+		// Get blocks
+		fetch('get-blocks.php?name=' + name) 
+		.then(resp => resp.json())
+		.then(json => {
+			if (json.err) {
+				$('#err').innerText = json.err;
+				$('#err').style.display = 'block';
+				return;
+			} 
+			// Update answers-div
+			$$('#answers-div p').forEach(p => {
+				p.parentNode.removeChild(p);
+			});
+			blocks = [];
+			letters = [];
+			for (let i=0; i<json.length; i++) {
+				const block = json[i];
+				blocks.push(Block(Point(block.fromx, block.fromy), Point(block.tox, block.toy)));
+				addAnswer(block.answer);
+			}
+			regenLetters();
+			repaint();
+		})
+		.catch(err => {
+			$('#err').innerText = err;
+			$('#err').style.display = 'block';
+		});
 	});
 }
 
-function drawBlock(ctx, block) {
+function drawBlock(ctx, idx) {
+	const block = blocks[idx];
 	let sx = block.from.x;
 	let sy = block.from.y;
 	let ex = block.to.x;
@@ -67,6 +144,39 @@ function drawBlock(ctx, block) {
 	const h = ey-sy;
 	ctx.fillStyle = '#fff';
 	ctx.fillRect(sx, sy, w, h);
+	// Display "letter" on block
+	if (letters[idx]) {
+		ctx.font = '24px sans-serif';
+		ctx.fillStyle = '#000';
+		ctx.fillText(letters[idx], sx+w/2-6, sy+h/2+8);
+	}
+}
+
+// A, B, AA, AB, etc.
+function makeLetter(idx) {
+	let letter = '';
+	do {
+		const i = idx % 26;
+		letter = String.fromCharCode(65+i) + letter;
+		idx = Math.floor(idx/26) - 1;
+	} while (idx >= 0);
+	return letter;
+}
+
+function regenLetters() {
+	const ps = $$('#answers-div p');
+	letters = [];
+	let letterCount = 0;
+	for (let i=0; i<ps.length; i++) {
+		const button = ps[i].querySelector('button');
+		const span = ps[i].querySelector('span');
+		if (button.innerText === 'Hide') {
+			letters[i] = makeLetter(letterCount++);
+			span.innerText = letters[i] + '.';
+		} else {
+			letters[i] = null;
+		}
+	}
 }
 
 function repaint() {
@@ -90,7 +200,7 @@ function repaint() {
 	ctx.drawImage(img, padw, padh, w, h);
 	// Draw blocks
 	for (let i=0; i<blocks.length; i++) {
-		drawBlock(ctx, blocks[i]);
+		drawBlock(ctx, i);
 	}
 }
 
@@ -211,9 +321,6 @@ window.addEventListener('load', e => {
 		}
 	});
 	$('#delete-page').addEventListener('click', e => {
-		// This is a button but probably not necessary
-		// since it's not part of a form
-		e.preventDefault();
 		const password = $('#edit-password').value;
 		// Validate name and password (global name)
 		if (!isAlphaNumeric(name) || isBlank(name)) {
@@ -229,30 +336,79 @@ window.addEventListener('load', e => {
 	});
 	// Placing and deleting blocks and letters on the image
 	$('#edit-canvas').addEventListener('mousedown', e => {
-		if (addingBlocks()) {
-			addingBlock = true;
-			const from = Point(e.offsetX, e.offsetY);
-			const to = from;
-			blocks.push(Block(from, to));
-		}
+		addingBlock = true;
+		const from = Point(e.offsetX, e.offsetY);
+		const to = from;
+		blocks.push(Block(from, to));
 	});
 	$('#edit-canvas').addEventListener('mouseout', e => {
-		if (addingBlocks() && addingBlock) {
+		if (addingBlock) {
 			blocks.pop();
 			addingBlock = false;
 			repaint();
 		}
 	});
 	$('#edit-canvas').addEventListener('mousemove', e => {
-		if (addingBlocks() && addingBlock) {
+		if (addingBlock) {
 			const to = Point(e.offsetX, e.offsetY);
 			blocks.at(-1).to = to;
 			repaint();
 		}
 	});
 	$('#edit-canvas').addEventListener('mouseup', e => {
-		if (addingBlocks() && addingBlock) {
+		if (addingBlock) {
 			addingBlock = false;
+			addAnswer();
+			regenLetters();
+			repaint();
 		}
+	});
+	// Save blocks with answers
+	$('#save-page').addEventListener('click', e => {
+		// Check that name and password isn't blank
+		if (!isAlphaNumeric(name) || isBlank(name)) {
+			alert('Bad page name');
+			return;
+		}
+		const password = $('#edit-password').value;
+		if (!isAlphaNumeric(password) || isBlank(password)) {
+			alert('Bad page password');
+			return;
+		}
+		// Check that all lettered blocks have answers
+		// Pack all answers into blocks
+		const savBlocks = [];
+		const ps = $$('#answers-div p');
+		for (let i=0; i<blocks.length; i++) {
+			savBlocks.push(Block(blocks[i].from, blocks[i].to));
+			if (letters[i]) {
+				const answer = ps[i].querySelector('input').value;
+				if (!answer.trim()) {
+					alert(`Answer block ${letters[i]} is blank`);
+					return;
+				}
+				savBlocks.at(-1).answer = answer.trim().toLowerCase();
+			} else {
+				savBlocks.at(-1).answer = '';
+			}
+		}
+		const payload = {name, password, savBlocks};
+		const json = JSON.stringify(payload);
+		// Send to server
+		fetch('save.php', {method: "POST", body: json})
+		.then(resp => resp.json())
+		.then(json => {
+			if (json.err) {
+				$('#err').innerText = json.err;
+				$('#err').style.display = 'block';
+			} else {
+				$('#feedback').innerText = 'Save successful';
+				$('#feedback').style.display = 'block';
+			}
+		})
+		.catch(err => {
+			$('#err').innerText = err;
+			$('#err').style.display = 'block';
+		});
 	});
 });
