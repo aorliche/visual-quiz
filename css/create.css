@@ -67,3 +67,7 @@ label[for='edit-password'] {
 	display: inline-block;
 	width: 1010px;
 }
+
+#hide-blocks {
+	margin-left: 10px;
+}

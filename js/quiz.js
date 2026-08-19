@@ -13,6 +13,7 @@ let img = null;
 let pages = [];
 let blocks = [];
 let letters = [];
+let hideBlocks = false;
 
 // A, B, AA, AB, etc.
 function makeLetter(idx) {
@@ -165,6 +166,10 @@ function repaint() {
 	const padw = (canvas.width-w)/2;
 	const padh = (canvas.height-h)/2;
 	ctx.drawImage(img, padw, padh, w, h);
+	// We're hiding blocks
+	if (hideBlocks) {
+		return;
+	}
 	// Draw blocks
 	for (let i=0; i<blocks.length; i++) {
 		drawBlock(ctx, i);
@@ -193,4 +198,16 @@ window.addEventListener('load', e => {
 		});
 	})
 	.catch(err => alert(err));
+	// Repaint without all the blocks
+	$('#hide-blocks').addEventListener('click', e => {
+		if ($('#hide-blocks').value === 'Hide Blocks') {
+			$('#hide-blocks').value = 'Show Blocks';
+			hideBlocks = true;
+			repaint();
+		} else {
+			$('#hide-blocks').value = 'Hide Blocks';
+			hideBlocks = false;
+			repaint();
+		}
+	});
 });
